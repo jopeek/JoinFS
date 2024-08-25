@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/JoinFS/FS2020/bin/Debug
+/JoinFS/.vs
+/.vs
+/JoinFS/FS2020/obj
+/JoinFS/FSX
+/JoinFS/obj
+/JoinFS/XPLANE/obj
+/JoinFS/P3DV4/obj
+/JoinFS/SERVER/bin/Debug/net6.0-windows
+/JoinFS/SERVER/obj/Debug/net6.0-windows
+/JoinFS/SERVER/obj/Release/net6.0-windows
