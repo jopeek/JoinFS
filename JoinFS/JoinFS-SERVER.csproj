@@ -13,7 +13,7 @@
     <BaseIntermediateOutputPath>SERVER\obj\</BaseIntermediateOutputPath>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <IsPublishable>False</IsPublishable>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>joinfs.pfx</AssemblyOriginatorKeyFile>
     <PackageIcon>joinfs64.png</PackageIcon>
     <PackageLicenseFile>D:\Dev\Projects\JoinFS\Licence.rtf</PackageLicenseFile>

@@ -604,50 +604,50 @@ namespace JoinFS
             }
 
             // check if latest version available
-            if (latestVersion != null)
-            {
-                // check current version
-                if (latestVersion.Length > 0 && latestVersion.Equals(Main.version) == false)
-                {
-                    // check if this version has been asked about
-                    if (Settings.Default.AskVersion.Equals(latestVersion) == false)
-                    {
-                        DialogResult result = MessageBox.Show(Resources.strings.NewVersion, Main.name + ": New Version", MessageBoxButtons.YesNo);
-                        if (result == DialogResult.Yes)
-                        {
-                            // check for early update
-                            if (Settings.Default.EarlyUpdate)
-                            {
-                                // open install page
-                                //string sc = Program.Code("https://joinfs.net/development.html", true, 1234);
-                                Main.LaunchEncoded(@"/nHgwBD1son?H[ggiMP~d*4bRK_FI__u>SN");
-                            }
-                            else
-                            {
-                                // open install page
-                                //string sc = Program.Code("https://joinfs.net/install.html", true, 1234);
-                                Main.LaunchEncoded(@"v[AwH+#Ci&+4m>(]qFf*y=}AgPm(?K_");
-                            }
-                            // shutdown
-                            main.shutdown = "";
-                        }
+            //if (latestVersion != null)
+            //{
+            //    // check current version
+            //    if (latestVersion.Length > 0 && latestVersion.Equals(Main.version) == false)
+            //    {
+            //        // check if this version has been asked about
+            //        if (Settings.Default.AskVersion.Equals(latestVersion) == false)
+            //        {
+            //            DialogResult result = MessageBox.Show(Resources.strings.NewVersion, Main.name + ": New Version", MessageBoxButtons.YesNo);
+            //            if (result == DialogResult.Yes)
+            //            {
+            //                // check for early update
+            //                if (Settings.Default.EarlyUpdate)
+            //                {
+            //                    // open install page
+            //                    //string sc = Program.Code("https://joinfs.net/development.html", true, 1234);
+            //                    Main.LaunchEncoded(@"/nHgwBD1son?H[ggiMP~d*4bRK_FI__u>SN");
+            //                }
+            //                else
+            //                {
+            //                    // open install page
+            //                    //string sc = Program.Code("https://joinfs.net/install.html", true, 1234);
+            //                    Main.LaunchEncoded(@"v[AwH+#Ci&+4m>(]qFf*y=}AgPm(?K_");
+            //                }
+            //                // shutdown
+            //                main.shutdown = "";
+            //            }
 
-                        // write version
-                        Settings.Default.AskVersion = latestVersion;
-                    }
-                    // new version available
-                    newVersion = true;
-                    // update toolbar
-                    Tool_Update.Text = Resources.strings.NewVersionStatus;
-                    Tool_Update.LinkColor = Color.DodgerBlue;
-                }
+            //            // write version
+            //            Settings.Default.AskVersion = latestVersion;
+            //        }
+            //        // new version available
+            //        newVersion = true;
+            //        // update toolbar
+            //        Tool_Update.Text = Resources.strings.NewVersionStatus;
+            //        Tool_Update.LinkColor = Color.DodgerBlue;
+            //    }
 
-                // reset latest version
-                latestVersion = null;
-                // close web client
-                versionWebClient.Dispose();
-                versionWebClient = null;
-            }
+            //    // reset latest version
+            //    latestVersion = null;
+            //    // close web client
+            //    versionWebClient.Dispose();
+            //    versionWebClient = null;
+            //}
 
             // refresh forms
 #if !SERVER
