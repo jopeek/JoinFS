@@ -147,30 +147,6 @@ namespace JoinFS
 #endif
 
 
-#if !NO_UPDATE
-                try
-                {
-                    // callback
-                    versionWebClient.DownloadStringCompleted += LatestVersionComplete;
-
-                    // check for early update
-                    if (Settings.Default.EarlyUpdate)
-                    {
-                        //string sc = Program.Code("http://joinfs.net/version-test", true, 1234);
-                        versionWebClient.DownloadStringAsync(new Uri(Program.Code(@"X~*L>OET1e6qF(~=@3r]`<,/p46bjc", false, 1234)));
-                    }
-                    else
-                    {
-                        //string sc = Program.Code("http://joinfs.net/version", true, 1234);
-                        versionWebClient.DownloadStringAsync(new Uri(Program.Code(@"K^x9E`;gZ2&:s={%T5zSw:cDz", false, 1234)));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // monitor event
-                    main.MonitorEvent(ex.Message);
-                }
-#endif
 
                 // load shortcuts
                 LoadShortcuts();
@@ -221,31 +197,6 @@ namespace JoinFS
             catch (Exception ex)
             {
                 main.ShowMessage(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// For checking version
-        /// </summary>
-        WebClient versionWebClient = new WebClient();
-        string latestVersion = null;
-
-        /// <summary>
-        /// callback for latest version
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void LatestVersionComplete(object sender, DownloadStringCompletedEventArgs e)
-        {
-            // check for error
-            if (e.Cancelled || e.Error != null || e.Result == null || e.Result.Length == 0 || e.Result[0] == '<')
-            {
-                latestVersion = "";
-            }
-            else
-            {
-                // get latest version
-                latestVersion = e.Result;
             }
         }
 

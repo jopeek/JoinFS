@@ -1,11 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-	<TargetFramework>net6.0-windows7.0</TargetFramework>
-	<OutputType>WinExe</OutputType>
-	<RootNamespace>JoinFS</RootNamespace>
-	<IsWebBootstrapper>false</IsWebBootstrapper>
-	<Nullable>disable</Nullable>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>JoinFS</RootNamespace>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <Nullable>disable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
@@ -19,23 +18,22 @@
     <PackageLicenseFile>D:\Dev\Projects\JoinFS\Licence.rtf</PackageLicenseFile>
     <StartupObject>JoinFS.Program</StartupObject>
     <Version>3.3.0</Version>
-    <Company></Company>
-    <Copyright></Copyright>
+    <Company>
+    </Company>
+    <Copyright>
+    </Copyright>
     <PackageProjectUrl>https://joinfs.net</PackageProjectUrl>
     <Description>Multiplayer Across Flight Simulators</Description>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>4</WarningLevel>
     <DefineConstants>SERVER;NO_JOIN</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>4</WarningLevel>
     <DefineConstants>SERVER;NO_JOIN</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="CONSOLE\**" />
     <Compile Remove="External\**" />
@@ -77,7 +75,6 @@
     <None Remove="Setup_TEST\**" />
     <None Remove="XPLANE\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="Forms\AircraftForm.cs" />
     <Compile Remove="Forms\AircraftForm.Designer.cs" />
@@ -122,7 +119,6 @@
     <Compile Remove="Quaternion.cs" />
     <Compile Remove="XPlane.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Remove="Forms\AircraftForm.de.resx" />
     <EmbeddedResource Remove="Forms\AircraftForm.es.resx" />
@@ -273,7 +269,6 @@
     <EmbeddedResource Remove="Properties\Resources-CONSOLE.resx" />
     <EmbeddedResource Remove="Properties\Resources-XPLANE.resx" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="App-FSX.config" />
     <None Remove="Directory.Build.props" />
@@ -292,15 +287,12 @@
     <None Remove="Resources\XPMP2_xsb_aircraft.dat" />
     <None Remove="win.xpl" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="App.ico" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="9.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -308,7 +300,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="Licence.rtf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -322,8 +313,7 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-
-	<Target Name="AfterBuild">
-		<Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /f &quot;$(ProjectDir)joinfs.pfx&quot; /p WSAiwsdj9( &quot;$(TargetPath)&quot;" />
-	</Target>
+  <Target Name="AfterBuild">
+    <Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /f &quot;$(ProjectDir)joinfs.pfx&quot; /p WSAiwsdj9( &quot;$(TargetPath)&quot;" />
+  </Target>
 </Project>
