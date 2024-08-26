@@ -3034,7 +3034,7 @@ namespace JoinFS
             JoinfsSession newSession = new JoinfsSession(
                 //id: 1, // Example ID, in real scenarios, IDs are often auto-incremented in the DB
                 node: nuid.ToString(),
-                nickname: nuid.ToString(),
+                nickname: "",
                 callsign: "",
                 lastUpdated: DateTime.Now
             );
