@@ -808,23 +808,6 @@ namespace JoinFS
                     // start recording
                     recorder.StartRecord(false);
                 }
-
-                // Connect to CAV database
-                // Create an instance of DatabaseHelper with the connection string
-                DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
-
-                // Create a new JoinfsSession object
-                JoinfsSession newSession = new JoinfsSession(
-                    //id: 1, // Example ID, in real scenarios, IDs are often auto-incremented in the DB
-                    nickname: "PilotOne",
-                    callsign: "P1C123",
-                    lastUpdated: DateTime.Now
-                );
-
-                // Use the DatabaseHelper to insert the new session into the database
-                dbHelper.CreateSession(newSession);
-
-                MonitorEvent("New JoinfsSession created successfully!");
                 
                 // monitor
                 MonitorEvent("Start complete");

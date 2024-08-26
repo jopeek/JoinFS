@@ -5,6 +5,7 @@ using System.Net;
 using System.IO;
 using System.Globalization;
 using JoinFS.Properties;
+using JoinFS.CAVModels;
 
 
 namespace JoinFS
@@ -13,6 +14,8 @@ namespace JoinFS
     {
         const string HUB_LIST_FILE = "hubs.dat";
         const ushort HUB_LIST_VERSION = 10006;
+
+        public string settingsConnectionString = "";
 
         public const int MAX_ADDRESS_LENGTH = 40;
         public const int MAX_NICKNAME_LENGTH = 20;
@@ -273,6 +276,8 @@ namespace JoinFS
                 // set local node external address
                 localNode.InternetAddress = address;
             }
+
+            settingsConnectionString = Settings.Default.cavConnectionString;
 
             // initialize reset time for DNS
             dnsResetTime = DateTime.Now.AddDays(1);
@@ -3019,7 +3024,25 @@ namespace JoinFS
             // add node
             nodeList[nuid] = new Node();
             // message
-            main.MonitorEvent("Added node '" + nuid + "' @ '" + EncodeIP(endPoint.ToString()) + "'");
+            main.MonitorEvent("Added node '" + nuid + "' @ '" + EncodeIP(endPoint.ToString()) + "' (" + endPoint.ToString() + ")");
+            // create session in cav db
+            DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
+
+            main.MonitorEvent("Connected to CAV database.");
+
+            // Create a new JoinfsSession object
+            JoinfsSession newSession = new JoinfsSession(
+                //id: 1, // Example ID, in real scenarios, IDs are often auto-incremented in the DB
+                node: nuid.ToString(),
+                nickname: nuid.ToString(),
+                callsign: "",
+                lastUpdated: DateTime.Now
+            );
+
+            // Use the DatabaseHelper to insert the new session into the database
+            dbHelper.CreateSession(newSession);
+
+            main.MonitorEvent("New JoinfsSession created.");
         }
 
         void NodeRoute(LocalNode.Nuid nuid, LocalNode.Nuid routeNuid)
@@ -3066,6 +3089,16 @@ namespace JoinFS
             main.sim ?. RemoveObject(nuid);
             // message
             main.MonitorEvent("Removed node '" + nuid + "'");
+
+            // remove JoinfsSession from cav database
+            DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
+
+            main.MonitorEvent("Connected to CAV database.");
+
+            // Use the DatabaseHelper to insert the new session into the database
+            dbHelper.DeleteSessionByNode(nuid.ToString());
+
+            main.MonitorEvent("JoinfsSession deleted.");
         }
 
         /// <summary>

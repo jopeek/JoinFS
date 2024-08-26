@@ -23,9 +23,10 @@ namespace JoinFS
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string query = "INSERT INTO joinfs_sessions (id, nickname, callsign, last_updated) VALUES (@id, @nickname, @callsign, @last_updated)";
+                string query = "INSERT INTO joinfs_sessions (id, node, nickname, callsign, last_updated) VALUES (@id, @node, @nickname, @callsign, @last_updated)";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", session.Id);
+                cmd.Parameters.AddWithValue("@node", session.Node);
                 cmd.Parameters.AddWithValue("@nickname", session.Nickname);
                 cmd.Parameters.AddWithValue("@callsign", session.Callsign);
                 cmd.Parameters.AddWithValue("@last_updated", session.LastUpdated);
@@ -47,6 +48,7 @@ namespace JoinFS
                     if (reader.Read())
                     {
                         return new JoinfsSession(
+                            reader.GetString("node"),
                             reader.GetString("nickname"),
                             reader.GetString("callsign"),
                             reader.GetDateTime("last_updated"),
@@ -67,8 +69,9 @@ namespace JoinFS
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string query = "UPDATE joinfs_sessions SET nickname = @nickname, callsign = @callsign, last_updated = @last_updated WHERE id = @id";
+                string query = "UPDATE joinfs_sessions SET node = @node, nickname = @nickname, callsign = @callsign, last_updated = @last_updated WHERE id = @id";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@node", session.Node);
                 cmd.Parameters.AddWithValue("@nickname", session.Nickname);
                 cmd.Parameters.AddWithValue("@callsign", session.Callsign);
                 cmd.Parameters.AddWithValue("@last_updated", session.LastUpdated);
@@ -90,17 +93,30 @@ namespace JoinFS
             }
         }
 
+        public void DeleteSessionByNode(string node)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM joinfs_sessions WHERE node = @node";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@node", node);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         // Similar CRUD methods can be created for JoinfsAircraft
         public void CreateAircraft(JoinfsAircraft aircraft)
         {
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string query = "INSERT INTO joinfs_aircrafts (id, callsign, owner, distance, heading, altitude, model) VALUES (@id, @callsign, @owner, @distance, @heading, @altitude, @model)";
+                string query = "INSERT INTO joinfs_aircrafts (id, callsign, owner, ownernode, distance, heading, altitude, model) VALUES (@id, @callsign, @owner, @distance, @heading, @altitude, @model)";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", aircraft.Id);
                 cmd.Parameters.AddWithValue("@callsign", aircraft.Callsign);
                 cmd.Parameters.AddWithValue("@owner", aircraft.Owner);
+                cmd.Parameters.AddWithValue("@ownernode", aircraft.OwnerNode);
                 cmd.Parameters.AddWithValue("@distance", aircraft.Distance);
                 cmd.Parameters.AddWithValue("@heading", aircraft.Heading);
                 cmd.Parameters.AddWithValue("@altitude", aircraft.Altitude);
@@ -125,6 +141,7 @@ namespace JoinFS
                             reader.GetInt32("id"),
                             reader.IsDBNull(reader.GetOrdinal("callsign")) ? null : reader.GetString("callsign"),
                             reader.IsDBNull(reader.GetOrdinal("owner")) ? null : reader.GetString("owner"),
+                            reader.IsDBNull(reader.GetOrdinal("ownernode")) ? null : reader.GetString("ownernode"),
                             reader.IsDBNull(reader.GetOrdinal("distance")) ? (float?)null : reader.GetFloat("distance"),
                             reader.IsDBNull(reader.GetOrdinal("heading")) ? (float?)null : reader.GetFloat("heading"),
                             reader.IsDBNull(reader.GetOrdinal("altitude")) ? (float?)null : reader.GetFloat("altitude"),
@@ -144,10 +161,11 @@ namespace JoinFS
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                string query = "UPDATE joinfs_aircrafts SET callsign = @callsign, owner = @owner, distance = @distance, heading = @heading, altitude = @altitude, model = @model WHERE id = @id";
+                string query = "UPDATE joinfs_aircrafts SET callsign = @callsign, owner = @owner, ownernode = @ownernode, distance = @distance, heading = @heading, altitude = @altitude, model = @model WHERE id = @id";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@callsign", aircraft.Callsign);
                 cmd.Parameters.AddWithValue("@owner", aircraft.Owner);
+                cmd.Parameters.AddWithValue("@ownernode", aircraft.OwnerNode);
                 cmd.Parameters.AddWithValue("@distance", aircraft.Distance);
                 cmd.Parameters.AddWithValue("@heading", aircraft.Heading);
                 cmd.Parameters.AddWithValue("@altitude", aircraft.Altitude);
