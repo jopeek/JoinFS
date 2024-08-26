@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net6.0-windows</TargetFramework>
+	<TargetFramework>net6.0-windows7.0</TargetFramework>
 	<OutputType>WinExe</OutputType>
 	<RootNamespace>JoinFS</RootNamespace>
 	<IsWebBootstrapper>false</IsWebBootstrapper>
@@ -18,7 +18,7 @@
     <PackageIcon>joinfs64.png</PackageIcon>
     <PackageLicenseFile>D:\Dev\Projects\JoinFS\Licence.rtf</PackageLicenseFile>
     <StartupObject>JoinFS.Program</StartupObject>
-    <Version>3.2.18</Version>
+    <Version>3.3.0</Version>
     <Company></Company>
     <Copyright></Copyright>
     <PackageProjectUrl>https://joinfs.net</PackageProjectUrl>
@@ -276,7 +276,6 @@
 
   <ItemGroup>
     <None Remove="App-FSX.config" />
-    <None Remove="App.config" />
     <None Remove="Directory.Build.props" />
     <None Remove="FileVersion.exe" />
     <None Remove="joinfs.pfx" />
@@ -296,6 +295,10 @@
 
   <ItemGroup>
     <Content Include="App.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>

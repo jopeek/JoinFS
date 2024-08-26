@@ -1558,5 +1558,15 @@ namespace JoinFS.Properties {
                 this["SkipCsl"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Server=va.canadaairvirtual.ca;Database=dbzhezgwgo0rzt;User ID=u2ejznmfmblts;Passw" +
+            "ord=yiog7a9o3etd")]
+        public string cavConnectionString {
+            get {
+                return ((string)(this["cavConnectionString"]));
+            }
+        }
     }
 }
