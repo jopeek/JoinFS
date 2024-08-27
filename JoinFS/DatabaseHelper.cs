@@ -318,5 +318,18 @@ namespace JoinFS
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public void CleanupDatabase()
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "DELETE FROM joinfs_aircrafts ";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.ExecuteNonQuery();
+                query = "DELETE FROM joinfs_sessions ";
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }

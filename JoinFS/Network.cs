@@ -1618,6 +1618,9 @@ namespace JoinFS
                 }
                 // show event
                 main.MonitorEvent("Left the session");
+
+                DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
+                dbHelper.CleanupDatabase();
                 // refresh
 #if !SERVER && !CONSOLE
                 main.aircraftForm ?. refresher.Schedule();

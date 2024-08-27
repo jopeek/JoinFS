@@ -174,7 +174,7 @@ namespace JoinFS
             try
             {
                 Logger.WriteLog("Starting JoinFS Server.");
-                
+
                 // get product name and file version
                 Assembly assembly = Assembly.GetExecutingAssembly();
                 // get name
@@ -582,6 +582,11 @@ namespace JoinFS
 
                 // create stopwatch
                 stopwatch = Stopwatch.StartNew();
+
+
+
+                DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
+                dbHelper.CleanupDatabase();
 
                 // get all JoinFS instances
                 Process[] instances = System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location));
