@@ -327,8 +327,9 @@ namespace JoinFS
                 string query = "DELETE FROM joinfs_aircrafts ";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.ExecuteNonQuery();
-                query = "DELETE FROM joinfs_sessions ";
-                cmd.ExecuteNonQuery();
+                string query2 = "DELETE FROM joinfs_sessions ";
+                MySqlCommand cmd2 = new MySqlCommand(query2, conn);
+                cmd2.ExecuteNonQuery();
             }
         }
     }
