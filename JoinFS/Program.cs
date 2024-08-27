@@ -173,6 +173,8 @@ namespace JoinFS
         {
             try
             {
+                Logger.WriteLog("Starting JoinFS Server.");
+                
                 // get product name and file version
                 Assembly assembly = Assembly.GetExecutingAssembly();
                 // get name

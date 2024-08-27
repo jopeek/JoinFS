@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Net;
-using System.IO;
-using System.Globalization;
+﻿using JoinFS.CAVModels;
 using JoinFS.Properties;
-using JoinFS.CAVModels;
+using System.Globalization;
+using System.Net;
+using static JoinFS.Network;
 
 
 namespace JoinFS
@@ -243,10 +240,10 @@ namespace JoinFS
         public Network(Main main)
         {
 
-//#if DEBUG
-//            int appCount = System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Length;
-//            int debugPort = 6112 + appCount;
-//#endif
+            //#if DEBUG
+            //            int appCount = System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Length;
+            //            int debugPort = 6112 + appCount;
+            //#endif
             // set main
             this.main = main;
 
@@ -329,7 +326,7 @@ namespace JoinFS
 #endif
 
 #if !CONSOLE
-            main.hubsForm ?. refresher.Schedule(5);
+            main.hubsForm?.refresher.Schedule(5);
 #endif
             addressBookTimer.Set(main.ElapsedTime + 4.0);
 
@@ -805,7 +802,7 @@ namespace JoinFS
                     localUserList.Clear();
 
                     // get user aircraft
-                    Sim.Aircraft aircraft = main.sim ?. userAircraft;
+                    Sim.Aircraft aircraft = main.sim?.userAircraft;
 
                     // check for local ATC
                     if (main.settingsAtc && main.settingsAtcAirport.Length > 0)
@@ -839,7 +836,7 @@ namespace JoinFS
                     foreach (var node in nodeList)
                     {
                         // get aircraft
-                        aircraft = main.sim ?. objectList.Find(o => o.ownerNuid == node.Key && o is Sim.Aircraft && (o as Sim.Aircraft).user) as Sim.Aircraft;
+                        aircraft = main.sim?.objectList.Find(o => o.ownerNuid == node.Key && o is Sim.Aircraft && (o as Sim.Aircraft).user) as Sim.Aircraft;
 
                         // check for ATC
                         if (node.Value.atc && node.Value.atcAirport.Length > 0)
@@ -1538,7 +1535,7 @@ namespace JoinFS
 #endif
 
 #if !CONSOLE
-                main.sessionForm ?. usersRefresher.Schedule(5);
+                main.sessionForm?.usersRefresher.Schedule(5);
 #endif
             }
             catch (Exception ex)
@@ -1577,7 +1574,7 @@ namespace JoinFS
 #endif
 
 #if !CONSOLE
-                main.sessionForm ?. usersRefresher.Schedule(5);
+                main.sessionForm?.usersRefresher.Schedule(5);
 #endif
             }
             catch (Exception ex)
@@ -1628,7 +1625,7 @@ namespace JoinFS
 #endif
 
 #if !CONSOLE
-                main.sessionForm ?. usersRefresher.Schedule();
+                main.sessionForm?.usersRefresher.Schedule();
 #endif
             }
         }
@@ -1685,7 +1682,7 @@ namespace JoinFS
 #endif
 
 #if !CONSOLE
-                main.sessionForm ?. usersRefresher.Schedule(5);
+                main.sessionForm?.usersRefresher.Schedule(5);
 #endif
             }
             catch (Exception ex)
@@ -3028,21 +3025,33 @@ namespace JoinFS
             // create session in cav db
             DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
 
-            main.MonitorEvent("Connected to CAV database.");
-
-            // Create a new JoinfsSession object
             JoinfsSession newSession = new JoinfsSession(
                 //id: 1, // Example ID, in real scenarios, IDs are often auto-incremented in the DB
                 node: nuid.ToString(),
                 nickname: "",
                 callsign: "",
-                lastUpdated: DateTime.Now
+                simulator: "",
+                connected: DateTime.UtcNow,
+                lastUpdated: DateTime.UtcNow
             );
 
-            // Use the DatabaseHelper to insert the new session into the database
             dbHelper.CreateSession(newSession);
 
-            main.MonitorEvent("New JoinfsSession created.");
+            JoinfsAircraft newAircraft = new JoinfsAircraft(
+                //id: 1, // Example ID, in real scenarios, IDs are often auto-incremented in the DB
+                callsign: "",
+                owner: "",
+                ownernode: nuid.ToString(),
+                distance: null,
+                heading: null,
+                altitude: null,
+                latitude: null,
+                longitude: null,
+                model: "",
+                lastUpdated: DateTime.UtcNow
+            );
+
+            dbHelper.CreateAircraft(newAircraft);
         }
 
         void NodeRoute(LocalNode.Nuid nuid, LocalNode.Nuid routeNuid)
@@ -3086,7 +3095,7 @@ namespace JoinFS
             // remove node
             nodeList.Remove(nuid);
             // remove all aircraft owned by the node
-            main.sim ?. RemoveObject(nuid);
+            main.sim?.RemoveObject(nuid);
             // message
             main.MonitorEvent("Removed node '" + nuid + "'");
 
@@ -3097,6 +3106,7 @@ namespace JoinFS
 
             // Use the DatabaseHelper to insert the new session into the database
             dbHelper.DeleteSessionByNode(nuid.ToString());
+            dbHelper.DeleteAircraftForNode(nuid.ToString());
 
             main.MonitorEvent("JoinfsSession deleted.");
         }
@@ -3108,6 +3118,10 @@ namespace JoinFS
         /// <param name="reader">Message reader</param>
         void ReceiveMsg(IPEndPoint endPoint, LocalNode.Nuid nuid, BinaryReader reader)
         {
+            //Logger.WriteLog("Inside ReceiveMsg");
+
+
+            // This may be where I want to get the aircraft data and update things
             try
             {
                 // read data version
@@ -3140,7 +3154,7 @@ namespace JoinFS
                                     Sim.Read(dataVersion, reader, ref positionVelocity);
 
                                     // update position and velocity
-                                    Sim.Obj simObject = main.sim ?. UpdateObject(nuid, netId, model, typerole, netTime, ref positionVelocity);
+                                    Sim.Obj simObject = main.sim?.UpdateObject(nuid, netId, model, typerole, netTime, ref positionVelocity);
 
                                     // check for object
                                     if (simObject != null)
@@ -3165,6 +3179,7 @@ namespace JoinFS
                         case MESSAGE_ID.AircraftPosition:
                             try
                             {
+                                //Logger.WriteLog("Reader Message ID: " + (MESSAGE_ID)reader.ReadInt16());
                                 // update stat
                                 Stats.AircraftPosition.Record(reader.BaseStream.Length);
                                 // check if connected
@@ -3209,7 +3224,7 @@ namespace JoinFS
                                             // get nickname
                                             string nickname = user ? main.network.GetNodeName(nuid) : "";
                                             // update position and velocity
-                                            Sim.Aircraft aircraft = main.sim ?. UpdateAircraft(nuid, netId, user, plane, callsign, nickname, model, typerole, netTime, ref aircraftPosition);
+                                            Sim.Aircraft aircraft = main.sim?.UpdateAircraft(nuid, netId, user, plane, callsign, nickname, model, typerole, netTime, ref aircraftPosition);
                                             // check for aircraft
                                             if (aircraft != null)
                                             {
@@ -3220,6 +3235,38 @@ namespace JoinFS
                                                 {
                                                     // record position and velocity
                                                     main.recorder.Record(aircraft.recorderObj, netTime, ref aircraftPosition);
+                                                }
+
+                                                // Update CAV db
+                                                DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
+                                                JoinfsAircraft currentAircraft = dbHelper.ReadAircraftForNode(nuid.ToString());
+                                                if (currentAircraft == null)
+                                                {
+                                                    JoinfsAircraft newAircraft = new JoinfsAircraft(
+                                                        //id: 1, // Example ID, in real scenarios, IDs are often auto-incremented in the DB
+                                                        callsign: callsign,
+                                                        owner: aircraft.owner.ToString(),
+                                                        ownernode: nuid.ToString(),
+                                                        distance: null,
+                                                        heading: aircraftPosition.heading,
+                                                        altitude: (float?)aircraftPosition.altitude,
+                                                        latitude: (float?)aircraftPosition.latitude,
+                                                        longitude: (float?)aircraftPosition.longitude,
+                                                        model: model,
+                                                        lastUpdated: DateTime.UtcNow
+                                                    );
+
+                                                    dbHelper.CreateAircraft(newAircraft);
+                                                } else
+                                                {
+                                                    currentAircraft.Callsign = callsign;
+                                                    currentAircraft.Owner = aircraft.owner.ToString();
+                                                    currentAircraft.Model = model;
+                                                    currentAircraft.Latitude = (float?)aircraftPosition.latitude;
+                                                    currentAircraft.Longitude = (float?)aircraftPosition.longitude;
+                                                    currentAircraft.Altitude = (float?)aircraftPosition.altitude;
+                                                    currentAircraft.Heading = aircraftPosition.heading;
+                                                    dbHelper.UpdateAircraft(currentAircraft);
                                                 }
                                             }
                                         }
@@ -3262,7 +3309,7 @@ namespace JoinFS
                                     else
                                     {
                                         // update aircraft in sim
-                                        Sim.Aircraft aircraft = main.sim ?. UpdateAircraft(nuid, netId, eventId, data, true);
+                                        Sim.Aircraft aircraft = main.sim?.UpdateAircraft(nuid, netId, eventId, data, true);
 
                                         // check for aircraft
                                         if (aircraft != null)
@@ -3327,7 +3374,7 @@ namespace JoinFS
                                     if (metar.Length > 0)
                                     {
                                         // set weather
-                                        main.sim ?. SetWeatherObservation(metar);
+                                        main.sim?.SetWeatherObservation(metar);
                                     }
                                 }
                             }
@@ -3351,7 +3398,7 @@ namespace JoinFS
                                     if (metar.Length > 0)
                                     {
                                         // set weather for aircraft
-                                        main.sim ?. SetWeatherObservation(nuid, metar);
+                                        main.sim?.SetWeatherObservation(nuid, metar);
                                     }
                                 }
                             }
@@ -3371,7 +3418,7 @@ namespace JoinFS
                                 {
                                     // get share cockpit
                                     byte share = reader.ReadByte();
-                                    main.sim ?. ShareCockpit(nuid, share);
+                                    main.sim?.ShareCockpit(nuid, share);
                                     // check for node
                                     if (nodeList.ContainsKey(nuid))
                                     {
@@ -3386,8 +3433,9 @@ namespace JoinFS
                                         {
                                             // update nickname
                                             node.nickname = nickname;
+
                                             // update ATC ID
-                                            main.sim ?. SetAtcId(nuid);
+                                            main.sim?.SetAtcId(nuid);
                                         }
                                         // set Guid
                                         node.guid = new Guid(reader.ReadBytes(16));
@@ -3433,6 +3481,13 @@ namespace JoinFS
                                         node.simulator = (dataVersion >= 10019) ? reader.ReadString() : "";
                                         // set simulator connected flag
                                         node.simulatorConnected = (dataVersion < 10024 || (flags & 0x04) != 0) ? true : false;
+
+                                        // Update CAV db
+                                        DatabaseHelper dbHelper = new DatabaseHelper(settingsConnectionString);
+                                        JoinfsSession currentSession = dbHelper.ReadSessionByNode(nuid.ToString());
+                                        currentSession.Nickname = node.nickname;
+                                        currentSession.Simulator = node.simulator;
+                                        dbHelper.UpdateSession(currentSession);
                                     }
                                 }
                             }
@@ -3708,7 +3763,7 @@ namespace JoinFS
                                 // update stat
                                 Stats.RemoveObject.Record(reader.BaseStream.Length);
                                 // remove object
-                                main.sim ?. RemoveObject(nuid, reader.ReadUInt32());
+                                main.sim?.RemoveObject(nuid, reader.ReadUInt32());
                             }
                             catch (Exception ex)
                             {
@@ -4186,13 +4241,13 @@ namespace JoinFS
                                             // get flight state
                                             bool flight = main.log.ShareCockpit(nuid) && nuid == shareFlightControls;
                                             // update variables
-                                            main.sim ?. UpdateAircraft(main.sim.userAircraft.ownerNuid, main.sim.userAircraft.netId, variables);
+                                            main.sim?.UpdateAircraft(main.sim.userAircraft.ownerNuid, main.sim.userAircraft.netId, variables);
                                         }
                                     }
                                     else
                                     {
                                         // update aircraft in sim
-                                        Sim.Aircraft aircraft = main.sim ?. UpdateAircraft(ownerNuid, netId, variables);
+                                        Sim.Aircraft aircraft = main.sim?.UpdateAircraft(ownerNuid, netId, variables);
 
                                         // check for aircraft
                                         if (aircraft != null)
@@ -4238,13 +4293,13 @@ namespace JoinFS
                                             // get flight state
                                             bool flight = main.log.ShareCockpit(nuid) && nuid == shareFlightControls;
                                             // update variables
-                                            main.sim ?. UpdateAircraft(main.sim.userAircraft.ownerNuid, main.sim.userAircraft.netId, variables);
+                                            main.sim?.UpdateAircraft(main.sim.userAircraft.ownerNuid, main.sim.userAircraft.netId, variables);
                                         }
                                     }
                                     else
                                     {
                                         // update aircraft in sim
-                                        Sim.Aircraft aircraft = main.sim ?. UpdateAircraft(ownerNuid, netId, variables);
+                                        Sim.Aircraft aircraft = main.sim?.UpdateAircraft(ownerNuid, netId, variables);
 
                                         // check for aircraft
                                         if (aircraft != null)
@@ -4290,13 +4345,13 @@ namespace JoinFS
                                             // get flight state
                                             bool flight = main.log.ShareCockpit(nuid) && nuid == shareFlightControls;
                                             // update variables
-                                            main.sim ?. UpdateAircraft(main.sim.userAircraft.ownerNuid, main.sim.userAircraft.netId, variables);
+                                            main.sim?.UpdateAircraft(main.sim.userAircraft.ownerNuid, main.sim.userAircraft.netId, variables);
                                         }
                                     }
                                     else
                                     {
                                         // update aircraft in sim
-                                        Sim.Aircraft aircraft = main.sim ?. UpdateAircraft(ownerNuid, netId, variables);
+                                        Sim.Aircraft aircraft = main.sim?.UpdateAircraft(ownerNuid, netId, variables);
 
                                         // check for aircraft
                                         if (aircraft != null)
@@ -4331,12 +4386,12 @@ namespace JoinFS
             }
         }
 
-#region DNS
+        #region DNS
 
         /// <summary>
         /// List of DNS lookups
         /// </summary>
-        Dictionary<string, IPAddress> dnsLookups = new Dictionary<string,IPAddress>();
+        Dictionary<string, IPAddress> dnsLookups = new Dictionary<string, IPAddress>();
 
         /// <summary>
         /// Time to reset DNS lookups
@@ -4393,9 +4448,9 @@ namespace JoinFS
             }
         }
 
-#endregion
+        #endregion
 
-#region Nodes
+        #region Nodes
 
         /// <summary>
         /// Node
@@ -4744,9 +4799,9 @@ namespace JoinFS
         public LocalNode.Nuid shareAncillaryControls = new LocalNode.Nuid();
         public LocalNode.Nuid shareNavControls = new LocalNode.Nuid();
 
-#endregion
+        #endregion
 
-#region Hubs
+        #region Hubs
 
         /// <summary>
         /// Hub user
@@ -4917,9 +4972,9 @@ namespace JoinFS
             return count;
         }
 
-#endregion
+        #endregion
 
-#region Online Users
+        #region Online Users
 
         /// <summary>
         /// Make a user ID from a GUID
@@ -5134,6 +5189,6 @@ namespace JoinFS
             RequestNuid(uuid);
         }
 
-#endregion
+        #endregion
     }
 }
